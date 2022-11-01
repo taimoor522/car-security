@@ -4,9 +4,9 @@ import 'package:code/lock_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import 'background_clipper.dart';
 import 'constants/widgets/animated_button.dart';
 import 'constants/widgets/botton_navbar_child.dart';
-import 'container_clipper.dart';
 
 void main() {
   runApp(
@@ -38,7 +38,7 @@ class App extends StatelessWidget {
               ),
             ),
             ClipPath(
-              clipper: ContainerClipper(),
+              clipper: BackgroundClipper(),
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
