@@ -1,17 +1,16 @@
-import 'package:code/colors.dart';
+import 'package:code/constants/colors.dart';
+import 'package:code/constants/strings.dart';
 import 'package:code/lock_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
 import 'container_clipper.dart';
 
 void main() {
-  runApp(
-    MaterialApp(
+  runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
-      home: const App(),
-    ),
-  );
+      home: const App()));
 }
 
 ValueNotifier<LockState> lockStateNotifier = ValueNotifier(LockState.unlocked);
@@ -23,46 +22,14 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        bottomNavigationBar: BottomAppBar(
-          color: Colors.black,
-          child: SizedBox(
-            height: 60,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: blue.withOpacity(0.2),
-                        blurRadius: 15,
-                        spreadRadius: 5,
-                        offset: const Offset(0, 0),
-                      ),
-                    ],
-                  ),
-                  child: const Icon(Icons.key, color: Colors.white),
-                ),
-                const Icon(Icons.location_on_outlined, color: Colors.white),
-                const Icon(Icons.settings, color: Colors.white),
-                const Icon(Icons.person, color: Colors.white),
-              ],
-            ),
-          ),
-        ),
+        bottomNavigationBar:
+            const BottomAppBar(color: black, child: BottomNavbarChild()),
         body: Stack(
           children: [
             Container(
               decoration: const BoxDecoration(
-                gradient: RadialGradient(
-                  radius: 1,
-                  colors: [
-                    grey,
-                    Colors.black,
-                  ],
-                ),
+                gradient:
+                    RadialGradient(radius: 1, colors: [grey, Colors.black]),
               ),
             ),
             ClipPath(
@@ -75,10 +42,7 @@ class App extends StatelessWidget {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomLeft,
                     tileMode: TileMode.repeated,
-                    colors: [
-                      darkGrey,
-                      grey,
-                    ],
+                    colors: [darkGrey, grey],
                   ),
                 ),
                 child: Column(
@@ -95,24 +59,18 @@ class App extends StatelessWidget {
                         Text('Connected', style: TextStyle(fontSize: 18))
                       ],
                     ),
-                    SvgPicture.asset(
-                      'assets/bmw.svg',
-                      height: 60,
-                    ),
-                    const Button(),
+                    SvgPicture.asset(bmwSvg, height: 60),
+                    const AnimatedButton(),
                     ValueListenableBuilder<LockState>(
                         valueListenable: lockStateNotifier,
-                        builder: (context, lockState, child) {
+                        builder: (_, lockState, __) {
                           return Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: Colors.black,
+                              color: black,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: Text(
-                              lockState.value,
-                              style: const TextStyle(),
-                            ),
+                            child: Text(lockState.value),
                           );
                         }),
                   ],
@@ -126,14 +84,50 @@ class App extends StatelessWidget {
   }
 }
 
-class Button extends StatefulWidget {
-  const Button({super.key});
+class BottomNavbarChild extends StatelessWidget {
+  const BottomNavbarChild({
+    Key? key,
+  }) : super(key: key);
 
   @override
-  State<Button> createState() => _ButtonState();
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 60,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(5),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: blue.withOpacity(0.2),
+                  blurRadius: 15,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: const Icon(Icons.key, color: Colors.white),
+          ),
+          const Icon(Icons.location_on_outlined, color: Colors.white),
+          const Icon(Icons.settings, color: Colors.white),
+          const Icon(Icons.person, color: Colors.white),
+        ],
+      ),
+    );
+  }
 }
 
-class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
+class AnimatedButton extends StatefulWidget {
+  const AnimatedButton({super.key});
+
+  @override
+  State<AnimatedButton> createState() => _AnimatedButtonState();
+}
+
+class _AnimatedButtonState extends State<AnimatedButton>
+    with SingleTickerProviderStateMixin {
   late final AnimationController buttonAnimationController;
   late final Animation<Alignment> buttonAnimation;
 
@@ -156,7 +150,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
         borderRadius: const BorderRadius.all(Radius.circular(100)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: black.withOpacity(0.2),
             blurRadius: 15,
             spreadRadius: 0,
             offset: const Offset(10, 5),
@@ -165,10 +159,7 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
         gradient: const RadialGradient(
           focalRadius: 0.5,
           radius: 1.2,
-          colors: [
-            grey,
-            darkGrey,
-          ],
+          colors: [grey, darkGrey],
         ),
       ),
       child: Container(
@@ -198,15 +189,19 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                               if (dragUpdateDetails.delta.dy > 0 &&
                                   lockState == LockState.unlocked) {
                                 buttonAnimationController.forward();
-                                Future.delayed(const Duration(seconds: 1), () {
-                                  lockStateNotifier.value = LockState.locked;
-                                });
+                                Future.delayed(
+                                  const Duration(seconds: 1),
+                                  () => lockStateNotifier.value =
+                                      LockState.locked,
+                                );
                               } else if (dragUpdateDetails.delta.dy < 0 &&
                                   lockState == LockState.locked) {
                                 buttonAnimationController.reverse();
-                                Future.delayed(const Duration(seconds: 1), () {
-                                  lockStateNotifier.value = LockState.unlocked;
-                                });
+                                Future.delayed(
+                                  const Duration(seconds: 1),
+                                  () => lockStateNotifier.value =
+                                      LockState.unlocked,
+                                );
                               }
                             },
                             child: Container(
@@ -217,14 +212,8 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
                                   colors: lockState == LockState.locked
-                                      ? [
-                                          red,
-                                          redDark,
-                                        ]
-                                      : [
-                                          blue,
-                                          blueDark,
-                                        ],
+                                      ? [red, redDark]
+                                      : [blue, blueDark],
                                 ),
                                 boxShadow: [
                                   BoxShadow(
@@ -232,21 +221,14 @@ class _ButtonState extends State<Button> with SingleTickerProviderStateMixin {
                                           ? red.withOpacity(0.2)
                                           : blue.withOpacity(0.2),
                                       blurRadius: 20,
-                                      spreadRadius: 10,
-                                      offset: const Offset(0, 0)),
+                                      spreadRadius: 10),
                                 ],
                               ),
                               child: lockState == LockState.locked
-                                  ? SvgPicture.asset(
-                                      'assets/lock.svg',
-                                      width: 30,
-                                      color: Colors.white,
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/key.svg',
-                                      width: 30,
-                                      color: Colors.white,
-                                    ),
+                                  ? SvgPicture.asset(lockSvg,
+                                      width: 30, color: Colors.white)
+                                  : SvgPicture.asset(keySvg,
+                                      width: 30, color: Colors.white),
                             ),
                           ),
                         );
@@ -287,12 +269,11 @@ class UserGuidWhenUnlocked extends StatelessWidget {
                   color: red.withOpacity(0.2),
                   blurRadius: 15,
                   spreadRadius: 5,
-                  offset: const Offset(0, 0),
                 ),
               ],
             ),
             child: SvgPicture.asset(
-              'assets/lock.svg',
+              lockSvg,
               width: 30,
               color: red,
             ),
@@ -323,12 +304,11 @@ class UserGuidWhenLocked extends StatelessWidget {
                   color: blue.withOpacity(0.1),
                   blurRadius: 15,
                   spreadRadius: 5,
-                  offset: const Offset(0, 0),
                 ),
               ],
             ),
             child: SvgPicture.asset(
-              'assets/key.svg',
+              keySvg,
               width: 30,
               color: blue,
             ),
@@ -358,9 +338,7 @@ class _ArrowUpState extends State<ArrowUp> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
     arrowAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
+        vsync: this, duration: const Duration(milliseconds: 1500));
 
     largeArrowOpacityAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
@@ -385,9 +363,7 @@ class _ArrowUpState extends State<ArrowUp> with SingleTickerProviderStateMixin {
 
     arrowAnimationController.repeat(reverse: false);
 
-    arrowAnimationController.addListener(() {
-      setState(() {});
-    });
+    arrowAnimationController.addListener(() => setState(() {}));
   }
 
   @override
@@ -445,9 +421,7 @@ class _ArrowDownState extends State<ArrowDown>
   void initState() {
     super.initState();
     arrowAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1500),
-    );
+        vsync: this, duration: const Duration(milliseconds: 1500));
 
     topArrowOpacityAnimation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(
@@ -472,9 +446,7 @@ class _ArrowDownState extends State<ArrowDown>
 
     arrowAnimationController.repeat(reverse: false);
 
-    arrowAnimationController.addListener(() {
-      setState(() {});
-    });
+    arrowAnimationController.addListener(() => setState(() {}));
   }
 
   @override
