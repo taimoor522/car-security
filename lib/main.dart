@@ -34,7 +34,7 @@ class App extends StatelessWidget {
             Container(
               decoration: const BoxDecoration(
                 gradient:
-                    RadialGradient(radius: 1, colors: [grey, Colors.black]),
+                    RadialGradient(radius: 1, colors: [grey, black]),
               ),
             ),
             ClipPath(
